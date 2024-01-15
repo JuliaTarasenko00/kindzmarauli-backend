@@ -1,19 +1,21 @@
-import dishesService from '../models/dishes/dishes-models.js';
 import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
+import Dish from '../models/Dish.js';
 
 export const getAll = async (req, res) => {
-  try {
-    const result = await dishesService.listDishes();
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
+  const { page, limit } = req.query;
+  const skip = (page - 1) * limit;
+
+  const result = await Dish.find({}, '', {
+    skip,
+    limit,
+  });
+  res.json(result);
 };
 
 export const getById = async (req, res) => {
   const { id } = req.params;
-  const result = await dishesService.getDishById(id);
+  const result = await Dish.findById(id);
 
   if (!result) {
     throw HttpError(404);
@@ -25,7 +27,7 @@ export const getById = async (req, res) => {
 export const addNewDish = async (req, res) => {
   const { body } = req;
 
-  const result = await dishesService.addDish(body);
+  const result = await Dish.create(body);
 
   res.status(201).json(result);
 };
@@ -34,7 +36,7 @@ export const updateDish = async (req, res) => {
   const { body } = req;
   const { id } = req.params;
 
-  const result = await dishesService.updateDish(id, body);
+  const result = await Dish.findByIdAndUpdate(id, body, { new: true });
 
   if (!result) {
     throw HttpError(404);
@@ -45,7 +47,8 @@ export const updateDish = async (req, res) => {
 
 export const deleteDish = async (req, res) => {
   const { id } = req.params;
-  const result = dishesService.removeDish(id);
+  console.log('id: ', id);
+  const result = await Dish.findByIdAndDelete(id);
 
   if (!result) {
     throw HttpError(404);
