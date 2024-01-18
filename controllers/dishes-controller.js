@@ -26,7 +26,6 @@ export const getById = async (req, res) => {
 
 export const addNewDish = async (req, res) => {
   const { body } = req;
-
   const result = await Dish.create(body);
 
   res.status(201).json(result);
@@ -47,7 +46,6 @@ export const updateDish = async (req, res) => {
 
 export const deleteDish = async (req, res) => {
   const { id } = req.params;
-  console.log('id: ', id);
   const result = await Dish.findByIdAndDelete(id);
 
   if (!result) {
