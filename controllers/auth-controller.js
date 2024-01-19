@@ -27,11 +27,12 @@ const sineUp = async (req, res) => {
     fullName: newUser.fullName,
     email: newUser.email,
     subscription: newUser.subscription,
+    phoneNumber: newUser.phoneNumber,
     token,
   });
 };
 
-export const signIn = async (req, res) => {
+const signIn = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -56,6 +57,7 @@ export const signIn = async (req, res) => {
     fullName: user.fullName,
     email: user.email,
     subscription: user.subscription,
+    phoneNumber: user.phoneNumber,
     token,
   });
 };

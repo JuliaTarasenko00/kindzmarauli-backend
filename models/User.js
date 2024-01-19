@@ -10,6 +10,8 @@ const userStatus = {
   message: "'subscription invalid'",
 };
 
+const phoneRegexp = /^0\d{2}\d{7}$/;
+
 const userSchema = new Schema(
   {
     fullName: {
@@ -32,6 +34,10 @@ const userSchema = new Schema(
       enum: userStatus,
       default: 'User',
     },
+    phoneNumber: {
+      type: String,
+      match: phoneRegexp,
+    },
   },
   { versionKey: false }
 );
@@ -49,6 +55,7 @@ export const userSineUpSchema = Joi.object({
     .messages({
       'any.only': `subscription invalid`,
     }),
+  phoneNumber: Joi.string().pattern(phoneRegexp),
 });
 
 export const userSignInSchema = Joi.object({

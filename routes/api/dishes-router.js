@@ -1,10 +1,10 @@
 import express from 'express';
 import dishesController from '../../controllers/dishes-controller.js';
 import { validateBody } from '../../decorators/index.js';
-import { dishesSchema } from '../../models/Dish.js';
+import { dishJoiSchema } from '../../models/Dish.js';
 import { authenticate, isValidId } from '../../middlewares/index.js';
 
-const addDishesValidate = validateBody(dishesSchema);
+const addDishesValidate = validateBody(dishJoiSchema);
 
 const dishesRouter = express.Router();
 

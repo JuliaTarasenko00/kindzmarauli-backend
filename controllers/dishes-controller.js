@@ -2,7 +2,7 @@ import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import Dish from '../models/Dish.js';
 
-export const getAll = async (req, res) => {
+const getAll = async (req, res) => {
   const { page, limit } = req.query;
   const skip = (page - 1) * limit;
 
@@ -13,7 +13,7 @@ export const getAll = async (req, res) => {
   res.json(result);
 };
 
-export const getById = async (req, res) => {
+const getById = async (req, res) => {
   const { id } = req.params;
   const result = await Dish.findById(id);
 
@@ -24,14 +24,14 @@ export const getById = async (req, res) => {
   res.json(result);
 };
 
-export const addNewDish = async (req, res) => {
+const addNewDish = async (req, res) => {
   const { body } = req;
   const result = await Dish.create(body);
 
   res.status(201).json(result);
 };
 
-export const updateDish = async (req, res) => {
+const updateDish = async (req, res) => {
   const { body } = req;
   const { id } = req.params;
 
@@ -44,7 +44,7 @@ export const updateDish = async (req, res) => {
   res.json(result);
 };
 
-export const deleteDish = async (req, res) => {
+const deleteDish = async (req, res) => {
   const { id } = req.params;
   const result = await Dish.findByIdAndDelete(id);
 

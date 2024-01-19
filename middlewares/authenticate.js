@@ -23,6 +23,12 @@ const authenticate = async (req, res, next) => {
       throw HttpError(401);
     }
 
+    if (user.subscription === 'User' && req.baseUrl === '/baskets') {
+      return next();
+    } else if (user.subscription === 'Admin' && req.baseUrl === '/baskets') {
+      throw HttpError(404, 'You do not have rights to make changes');
+    }
+
     if (user.subscription !== 'Admin') {
       throw HttpError(404, 'You do not have rights to make changes');
     }
