@@ -38,6 +38,9 @@ const userSchema = new Schema(
       type: String,
       match: phoneRegexp,
     },
+    token: {
+      type: String,
+    },
   },
   { versionKey: false }
 );

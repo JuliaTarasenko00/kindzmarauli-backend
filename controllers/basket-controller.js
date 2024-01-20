@@ -4,27 +4,32 @@ import Basket from '../models/Basket.js';
 import { dishPricing } from '../helpers/index.js';
 
 const getBasketProduct = async (req, res) => {
-  const result = await Basket.find();
+  const { _id: owner } = req.user;
+  const result = await Basket.find({ owner });
+
   res.json(result);
 };
 
 const addDishBasket = async (req, res) => {
+  const { _id: owner } = req.user;
   const { idProduct } = req.body;
-  const duplicateIdProduct = await Basket.findOne({ idProduct });
+  const duplicateIdProduct = await Basket.findOne({ idProduct, owner });
   const { finalPrice } = dishPricing(req.body);
 
   if (duplicateIdProduct) {
     throw HttpError(409, 'This dish is already in the basket');
   }
 
-  const result = await Basket.create({ ...req.body, total: finalPrice });
+  const result = await Basket.create({ ...req.body, total: finalPrice, owner });
 
   res.status(201).json(result);
 };
 
 const updateCountDishBasket = async (req, res, operation) => {
   const { id } = req.params;
-  const data = await Basket.findById(id);
+  const { _id: owner } = req.user;
+
+  const data = await Basket.findOne({ _id: id, owner });
 
   if (!data) {
     throw HttpError(404);

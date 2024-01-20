@@ -18,21 +18,19 @@ const authenticate = async (req, res, next) => {
   try {
     const { id } = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(id);
-
-    if (!user) {
+    if (!user || !user.token) {
       throw HttpError(401);
     }
 
-    if (user.subscription === 'User' && req.baseUrl === '/baskets') {
-      return next();
-    } else if (user.subscription === 'Admin' && req.baseUrl === '/baskets') {
+    if (user.subscription === 'Admin' && req.baseUrl === '/baskets') {
       throw HttpError(404, 'You do not have rights to make changes');
     }
 
-    if (user.subscription !== 'Admin') {
+    if (user.subscription !== 'Admin' && req.baseUrl === '/dishes') {
       throw HttpError(404, 'You do not have rights to make changes');
     }
 
+    req.user = user;
     next();
   } catch (error) {
     const { status = 401, message } = error;

@@ -20,8 +20,10 @@ const sineUp = async (req, res) => {
   const payload = {
     id: newUser._id,
   };
+  const { _id: id } = newUser;
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2d' });
+  await User.findByIdAndUpdate(id, { token });
 
   res.status(201).json({
     fullName: newUser.fullName,
@@ -50,8 +52,10 @@ const signIn = async (req, res) => {
   const payload = {
     id: user._id,
   };
+  const { _id: id } = user;
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '2d' });
+  await User.findByIdAndUpdate(id, { token });
 
   res.json({
     fullName: user.fullName,
@@ -62,7 +66,30 @@ const signIn = async (req, res) => {
   });
 };
 
+const getCurrent = async (req, res) => {
+  const { _id, fullName, email, subscription, phoneNumber } = req.user;
+
+  res.json({
+    _id,
+    fullName,
+    email,
+    subscription,
+    phoneNumber,
+  });
+};
+
+const logOut = async (req, res) => {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: '' });
+
+  res.json({
+    message: 'Signout success',
+  });
+};
+
 export default {
   sineUp: ctrlWrapper(sineUp),
   signIn: ctrlWrapper(signIn),
+  getCurrent: ctrlWrapper(getCurrent),
+  logOut: ctrlWrapper(logOut),
 };

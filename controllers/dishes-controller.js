@@ -3,13 +3,22 @@ import { ctrlWrapper } from '../decorators/index.js';
 import Dish from '../models/Dish.js';
 
 const getAll = async (req, res) => {
-  const { page, limit } = req.query;
+  const { page, limit, name } = req.query;
   const skip = (page - 1) * limit;
 
-  const result = await Dish.find({}, '', {
-    skip,
-    limit,
-  });
+  if (name && name.length < 3) {
+    throw HttpError(400);
+  }
+
+  const result = await Dish.find(
+    { ...(name !== undefined && { name: new RegExp(`^${name}`, 'i') }) },
+    '',
+    {
+      skip,
+      limit,
+    }
+  );
+
   res.json(result);
 };
 

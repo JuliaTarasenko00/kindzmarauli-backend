@@ -31,8 +31,13 @@ const basketSchema = new Schema(
     total: {
       type: Number,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+     required: true,
+    },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 export const basketJoiSchema = Joi.object({
