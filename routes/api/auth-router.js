@@ -9,7 +9,7 @@ const authRouter = Router();
 const userSineUpValidate = validateBody(userSineUpSchema);
 const userSignInValidate = validateBody(userSignInSchema);
 
-authRouter.post('/sineup', userSineUpValidate, auntController.sineUp);
+authRouter.post('/signup', userSineUpValidate, auntController.sineUp);
 authRouter.post('/signin', userSignInValidate, auntController.signIn);
 authRouter.get('/current', authenticate, auntController.getCurrent);
 authRouter.post('/signout', authenticate, auntController.logOut);
