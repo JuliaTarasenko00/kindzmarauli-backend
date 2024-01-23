@@ -86,13 +86,14 @@ const reductionCountDishBasket = (req, res) =>
 const deleteDish = async (req, res) => {
   const { id } = req.params;
   const result = await Basket.findByIdAndDelete(id);
+  console.log('result: ', result);
 
   if (!result) {
     throw HttpError(404);
   }
 
   res.json({
-    message: 'Delete success',
+    _id: result._id,
   });
 };
 
