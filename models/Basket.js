@@ -8,7 +8,11 @@ const basketSchema = new Schema(
       type: String,
       required: true,
     },
-    nameProduct: {
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
       type: String,
       required: true,
     },
@@ -33,8 +37,8 @@ const basketSchema = new Schema(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "user",
-     required: true,
+      ref: 'user',
+      required: true,
     },
   },
   { versionKey: false, timestamps: true }
@@ -42,7 +46,8 @@ const basketSchema = new Schema(
 
 export const basketJoiSchema = Joi.object({
   idProduct: Joi.string().required(),
-  nameProduct: Joi.string().required(),
+  name: Joi.string().required(),
+  image: Joi.string().required(),
   price: Joi.number().required(),
   discounted: Joi.number().required(),
   gram: Joi.number().required(),
