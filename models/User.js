@@ -37,6 +37,7 @@ const userSchema = new Schema(
     phoneNumber: {
       type: String,
       match: phoneRegexp,
+      unique: true,
     },
     token: {
       type: String,

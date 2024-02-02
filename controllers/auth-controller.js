@@ -7,12 +7,18 @@ import User from '../models/User.js';
 const { JWT_SECRET } = process.env;
 
 const sineUp = async (req, res) => {
-  const { email, password } = req.body;
-  const userDuplicate = await User.findOne({ email });
+  const { email, password, phoneNumber } = req.body;
+  const userDuplicateEmail = await User.findOne({ email });
+  const userDuplicateNumber = await User.findOne({ phoneNumber });
 
-  if (userDuplicate) {
+  if (userDuplicateEmail) {
     throw HttpError(409, 'Password or Email invalid');
   }
+
+  if (userDuplicateNumber) {
+    throw HttpError(409, 'Duplicate phone number');
+  }
+
   const hashPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({ ...req.body, password: hashPassword });
