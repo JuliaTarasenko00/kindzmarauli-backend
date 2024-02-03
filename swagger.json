@@ -1,0 +1,285 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "2.0.0",
+    "title": "Swagger Kindzmarauli",
+    "description": "Showing off swagger-ui-express",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "consume": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    { "url": "https://kindzmarauli-backend.onrender.com" },
+    { "url": "http://localhost:3000" }
+  ],
+  "tags": [
+    { "name": "Auth", "description": "Authorization endpoints" },
+    { "name": "Baskets", "description": "Baskets endpoints" },
+    { "name": "Dishes", "description": "Dishes endpoints" }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User register",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Create user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+
+          "400": {
+            "description": "Bad Request"
+          },
+          "409": {
+            "description": "Incorrect Data (Password or Email invalid or Duplicate phone number)"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "Login's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RegisterResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Password or Email invalid"
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/auth/current": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "User current",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "Bearer token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CurrentResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Missing header with authorization token."
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    },
+    "/auth/signout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User current",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "description": "Bearer token",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "The user is logged out."
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Missing header with authorization token."
+          },
+          "500": {
+            "description": "Server Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": ["email", "password", "fullName", "phoneNumber"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User`s email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User`s password",
+            "example": "qwe12345"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "User`s Full Name",
+            "example": "Full Name"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "User`s phone number",
+            "example": "0900000000"
+          }
+        }
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User`s email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User`s password",
+            "example": "qwe12345"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "User`s Full Name",
+            "example": "Full Name"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "User`s phone number",
+            "example": "0900000000"
+          },
+          "subscription": {
+            "type": "string",
+            "description": "User`s role",
+            "example": "User"
+          },
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1YmU5YjZkNDg0ZTMzNDU4NzY3NDAyNyIsImlhdCI6MTcwNjk5MDQ0NSwiZXhwIjoxNzA3MTYzMjQ1fQ.hbchNnk6WNT3sUy92Xt8R9xEEK7VsoBYsTYeT50h9Pg"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User`s email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User`s password",
+            "example": "qwe12345"
+          }
+        }
+      },
+      "CurrentResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "65bea3ba9d9a325dcf980057"
+          },
+          "email": {
+            "type": "string",
+            "description": "User`s email",
+            "format": "email"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "User`s Full Name",
+            "example": "Full Name"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "description": "User`s phone number",
+            "example": "0900000000"
+          },
+          "subscription": {
+            "type": "string",
+            "description": "User`s role",
+            "example": "User"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
