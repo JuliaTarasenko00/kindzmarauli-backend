@@ -10,6 +10,8 @@ const dishesRouter = express.Router();
 
 dishesRouter.get('/', dishesController.getAll);
 
+dishesRouter.get('/specifics', dishesController.getSpecificsDish);
+
 dishesRouter.get('/:id', isValidId, dishesController.getById);
 
 dishesRouter.post(

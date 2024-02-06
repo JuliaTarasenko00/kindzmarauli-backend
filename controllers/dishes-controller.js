@@ -22,6 +22,21 @@ const getAll = async (req, res) => {
   res.json(result);
 };
 
+const getSpecificsDish = async (req, res) => {
+  const { specificsDish } = req.query;
+  console.log('specificsDish: ', specificsDish);
+
+  if (!specificsDish) {
+    throw HttpError(400);
+  }
+
+  const result = await Dish.find({
+    [`specificsDish.${specificsDish}`]: { $exists: true },
+  });
+
+  res.json(result);
+};
+
 const getById = async (req, res) => {
   const { id } = req.params;
   const result = await Dish.findById(id);
@@ -68,6 +83,7 @@ const deleteDish = async (req, res) => {
 
 export default {
   getAll: ctrlWrapper(getAll),
+  getSpecificsDish: ctrlWrapper(getSpecificsDish),
   getById: ctrlWrapper(getById),
   addNewDish: ctrlWrapper(addNewDish),
   updateDish: ctrlWrapper(updateDish),

@@ -26,7 +26,7 @@ const dishSchema = new Schema(
       required: true,
     },
     specificsDish: {
-      type: String,
+      type: Object,
       required: true,
     },
     image: {
@@ -43,7 +43,7 @@ export const dishJoiSchema = Joi.object({
   price: Joi.number().required(),
   discounted: Joi.number(),
   gram: Joi.number().required(),
-  specificsDish: Joi.string().required(),
+  specificsDish: Joi.object().required(),
   image: Joi.string().required(),
 });
 
