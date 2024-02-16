@@ -10,6 +10,11 @@ const getAll = async (req, res) => {
     throw HttpError(400);
   }
 
+  const totalItems = await Dish.countDocuments({
+    ...(name !== undefined && { name: new RegExp(`^${name}`, 'i') }),
+  });
+  const totalPages = page ? Math.ceil(totalItems / limit) : 1;
+
   const result = await Dish.find(
     { ...(name !== undefined && { name: new RegExp(`^${name}`, 'i') }) },
     '',
@@ -19,7 +24,7 @@ const getAll = async (req, res) => {
     }
   );
 
-  res.json(result);
+  res.json({ result, totalPages });
 };
 
 const getSpecificsDish = async (req, res) => {
