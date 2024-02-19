@@ -80,9 +80,8 @@ const deleteDish = async (req, res) => {
   if (!result) {
     throw HttpError(404);
   }
-
   res.json({
-    message: 'Delete success',
+    _id: result._id,
   });
 };
 
