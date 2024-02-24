@@ -3,6 +3,7 @@ import dishesController from '../../controllers/dishes-controller.js';
 import { validateBody } from '../../decorators/index.js';
 import { dishJoiSchema } from '../../models/Dish.js';
 import { authenticate, isValidId } from '../../middlewares/index.js';
+import upload from '../../middlewares/cloudinary.js';
 
 const addDishesValidate = validateBody(dishJoiSchema);
 
@@ -18,14 +19,15 @@ dishesRouter.post(
   '/',
   authenticate,
   addDishesValidate,
+  upload.single('image'),
   dishesController.addNewDish
 );
 
-dishesRouter.put(
+dishesRouter.patch(
   '/:id',
   authenticate,
+  upload.single('image'),
   isValidId,
-  addDishesValidate,
   dishesController.updateDish
 );
 

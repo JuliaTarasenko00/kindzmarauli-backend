@@ -29,7 +29,6 @@ const getAll = async (req, res) => {
 
 const getSpecificsDish = async (req, res) => {
   const { specificsDish } = req.query;
-  console.log('specificsDish: ', specificsDish);
 
   if (!specificsDish) {
     throw HttpError(400);
@@ -55,6 +54,7 @@ const getById = async (req, res) => {
 
 const addNewDish = async (req, res) => {
   const { body } = req;
+
   const result = await Dish.create(body);
 
   res.status(201).json(result);
@@ -64,7 +64,22 @@ const updateDish = async (req, res) => {
   const { body } = req;
   const { id } = req.params;
 
-  const result = await Dish.findByIdAndUpdate(id, body, { new: true });
+  let path = '';
+
+  if (req.file) {
+    path = req.file.path;
+  }
+  console.log('path: ', path);
+
+  const img = path !== '' && { image: path };
+
+  const data = {
+    ...body,
+    specificsDish: JSON.parse(body.specificsDish),
+    ...img,
+  };
+
+  const result = await Dish.findByIdAndUpdate(id, data, { new: true });
 
   if (!result) {
     throw HttpError(404);
