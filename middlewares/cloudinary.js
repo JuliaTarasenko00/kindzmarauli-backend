@@ -15,7 +15,7 @@ const storage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: 'images',
-      public_id: `${req.user._id}`,
+      public_id: `${req.params.id}`,
     };
   },
 });
