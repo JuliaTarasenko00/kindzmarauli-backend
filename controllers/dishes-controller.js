@@ -55,7 +55,21 @@ const getById = async (req, res) => {
 const addNewDish = async (req, res) => {
   const { body } = req;
 
-  const result = await Dish.create(body);
+  let path = '';
+
+  if (req.file) {
+    path = req.file.path;
+  }
+
+  const img = path !== '' && { image: path };
+
+  const data = {
+    ...body,
+    specificsDish: JSON.parse(body.specificsDish),
+    ...img,
+  };
+
+  const result = await Dish.create(data);
 
   res.status(201).json(result);
 };
@@ -69,7 +83,6 @@ const updateDish = async (req, res) => {
   if (req.file) {
     path = req.file.path;
   }
-  console.log('path: ', path);
 
   const img = path !== '' && { image: path };
 
