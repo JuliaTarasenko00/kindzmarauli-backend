@@ -2,6 +2,13 @@ import { HttpError } from '../helpers/index.js';
 import { ctrlWrapper } from '../decorators/index.js';
 import Basket from '../models/Basket.js';
 import { dishPricing } from '../helpers/index.js';
+import Dish from '../models/Dish.js';
+
+const calculateTotalPrice = state => {
+  return state.reduce((sum, obj) => {
+    return obj.total + sum;
+  }, 0);
+};
 
 const getBasketProduct = async (req, res) => {
   const { _id: owner } = req.user;
@@ -12,26 +19,64 @@ const getBasketProduct = async (req, res) => {
 
 const addDishBasket = async (req, res) => {
   const { _id: owner } = req.user;
-  const { idProduct } = req.body;
-  const duplicateIdProduct = await Basket.findOne({ idProduct, owner });
-  const { finalPrice } = dishPricing(req.body);
+  const { id } = req.params;
+
+  const dish = await Dish.findById(id);
+
+  if (!dish) {
+    throw HttpError(404);
+  }
+
+  const basketUser = await Basket.findOne({ owner });
+  const { finalPrice } = dishPricing(dish);
+
+  const duplicateIdProduct = basketUser?.goods.dishes.find(el => el._id === id);
 
   if (duplicateIdProduct) {
     throw HttpError(409, 'This dish is already in the basket');
   }
 
-  const result = await Basket.create({ ...req.body, total: finalPrice, owner });
+  const newDish = { ...dish._doc, total: finalPrice };
 
-  res.status(201).json(result);
+  const updatedDishes = basketUser
+    ? [newDish, ...basketUser?.goods.dishes]
+    : [newDish];
+
+  const totalPriceBasket = calculateTotalPrice(updatedDishes);
+
+  const updatedGoods = {
+    dishes: updatedDishes,
+    totalPriceDishes: totalPriceBasket,
+  };
+
+  let result;
+  if (basketUser) {
+    result = await Basket.findByIdAndUpdate(
+      basketUser._id,
+      { goods: updatedGoods },
+      { new: true }
+    );
+  } else {
+    result = await Basket.create({ goods: updatedGoods, owner });
+    res.status(201);
+  }
+
+  res.json(result);
 };
 
 const updateCountDishBasket = async (req, res, operation) => {
   const { id } = req.params;
   const { _id: owner } = req.user;
 
-  const data = await Basket.findOne({ _id: id, owner });
+  const data = await Basket.findOne({ owner });
 
   if (!data) {
+    throw HttpError(404);
+  }
+
+  const dish = data.goods.dishes.find(el => el._id.toString() === id);
+
+  if (!dish) {
     throw HttpError(404);
   }
 
@@ -40,35 +85,47 @@ const updateCountDishBasket = async (req, res, operation) => {
   let newBody = {};
 
   if (operation === 'magnification') {
-    const { finalPrice } = dishPricing(data);
+    const { finalPrice } = dishPricing(dish);
 
-    newCount = data.count + 1;
+    newCount = dish.count + 1;
     newTotal = finalPrice * newCount;
 
     newBody = {
-      ...data._doc,
+      ...dish._doc,
       count: newCount,
       total: newTotal,
     };
   } else if (operation === 'reduction') {
-    if (data.count <= 1) {
+    if (dish.count <= 1) {
       throw HttpError(404);
     }
 
-    newCount = data.count - 1;
-    const total = data.total / (newCount + 1);
-    newTotal = data.total - total;
+    newCount = dish.count - 1;
+    const total = dish.total / (newCount + 1);
+    newTotal = dish.total - total;
 
     newBody = {
-      ...data._doc,
+      ...dish._doc,
       count: newCount,
       total: newTotal,
     };
   }
+  const updatedDishes = data.goods.dishes.map(d =>
+    d._id.toString() === id ? newBody : d
+  );
 
-  const result = await Basket.findByIdAndUpdate(id, newBody, {
-    new: true,
-  });
+  const totalPriceBasket = calculateTotalPrice(updatedDishes);
+
+  const updatedGoods = {
+    dishes: updatedDishes,
+    totalPriceDishes: totalPriceBasket,
+  };
+
+  const result = await Basket.findByIdAndUpdate(
+    data._id,
+    { goods: updatedGoods },
+    { new: true }
+  );
 
   if (!result) {
     throw HttpError(404);
@@ -84,9 +141,42 @@ const reductionCountDishBasket = (req, res) =>
   updateCountDishBasket(req, res, 'reduction');
 
 const deleteDish = async (req, res) => {
+  const { _id: owner } = req.user;
+  const { id } = req.params;
+
+  const basketUser = await Basket.findOne({ owner });
+
+  if (!basketUser) {
+    throw new HttpError(404, 'Basket not found');
+  }
+
+  const updatedDishes = basketUser.goods.dishes.filter(
+    el => el._id.toString() !== id
+  );
+
+  if (!updatedDishes) {
+    throw HttpError(404);
+  }
+
+  const totalPriceBasket = calculateTotalPrice(updatedDishes);
+
+  const updatedGoods = {
+    dishes: updatedDishes,
+    totalPriceDishes: totalPriceBasket,
+  };
+
+  const result = await Basket.findByIdAndUpdate(
+    basketUser._id,
+    { goods: updatedGoods },
+    { new: true }
+  );
+
+  res.json(result);
+};
+
+const removeBasket = async (req, res) => {
   const { id } = req.params;
   const result = await Basket.findByIdAndDelete(id);
-  console.log('result: ', result);
 
   if (!result) {
     throw HttpError(404);
@@ -103,4 +193,5 @@ export default {
   reductionCountDishBasket: ctrlWrapper(reductionCountDishBasket),
   magnificationCountDishBasket: ctrlWrapper(magnificationCountDishBasket),
   deleteDish: ctrlWrapper(deleteDish),
+  removeBasket: ctrlWrapper(removeBasket),
 };

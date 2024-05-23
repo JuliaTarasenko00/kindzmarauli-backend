@@ -7,7 +7,7 @@ const basketRouter = Router();
 basketRouter.use(authenticate);
 
 basketRouter.get('/', basketsController.getBasketProduct);
-basketRouter.post('/', basketsController.addDishBasket);
+basketRouter.post('/addToBasket/:id', basketsController.addDishBasket);
 basketRouter.put(
   '/magnification/:id',
   isValidId,
@@ -18,6 +18,11 @@ basketRouter.put(
   isValidId,
   basketsController.reductionCountDishBasket
 );
-basketRouter.delete('/:id', isValidId, basketsController.deleteDish);
+basketRouter.delete(
+  '/delete/dish/:id',
+  isValidId,
+  basketsController.deleteDish
+);
+basketRouter.delete('/clear/:id', isValidId, basketsController.removeBasket);
 
 export default basketRouter;
