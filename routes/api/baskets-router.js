@@ -7,7 +7,11 @@ const basketRouter = Router();
 basketRouter.use(authenticate);
 
 basketRouter.get('/', basketsController.getBasketProduct);
-basketRouter.post('/addToBasket/:id', basketsController.addDishBasket);
+basketRouter.post(
+  '/addToBasket/:id',
+  isValidId,
+  basketsController.addDishBasket
+);
 basketRouter.put(
   '/magnification/:id',
   isValidId,

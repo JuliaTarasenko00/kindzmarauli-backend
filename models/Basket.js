@@ -54,16 +54,24 @@ const basketSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-// export const basketJoiSchema = Joi.object({
-//   idProduct: Joi.string().required(),
-//   name: Joi.string().required(),
-//   image: Joi.string().required(),
-//   price: Joi.number().required(),
-//   discounted: Joi.number().required(),
-//   gram: Joi.number().required(),
-//   count: Joi.number(),
-//   total: Joi.number(),
-// });
+export const basketJoiSchema = Joi.object({
+  goods: Joi.object({
+    dishes: Joi.array().items(
+      Joi.object({
+        _id: Joi.string().required(),
+        name: Joi.string().required(),
+        image: Joi.string().required(),
+        price: Joi.number().required(),
+        discounted: Joi.number().default(0),
+        gram: Joi.number().required(),
+        count: Joi.number().default(1),
+        total: Joi.number(),
+      })
+    ),
+    totalPriceDishes: Joi.number().required(),
+  }),
+  owner: Joi.string().required(),
+});
 
 basketSchema.post('save', handleSaveError);
 basketSchema.pre('findOneAndUpdate', runValidation);
