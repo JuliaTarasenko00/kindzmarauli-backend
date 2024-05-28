@@ -14,7 +14,7 @@ const getBasketProduct = async (req, res) => {
   const { _id: owner } = req.user;
   const result = await Basket.find({ owner });
 
-  res.json(result);
+  res.json(...result);
 };
 
 const addDishBasket = async (req, res) => {
